@@ -7,7 +7,6 @@ import data.SkierDbConnection;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.concurrent.TimeoutException;
 
 public class DbWriteWorker implements Runnable {
@@ -18,7 +17,7 @@ public class DbWriteWorker implements Runnable {
     @Override
     public void run() {
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost("localhost");
+        factory.setHost("localhost");  // Can stay localhost on server, same machine
         Connection connection = null;
         try {
             connection = factory.newConnection();
@@ -34,9 +33,10 @@ public class DbWriteWorker implements Runnable {
             channel.queueDeclare(QUEUE_NAME, false, false, false, null);
 
             DeliverCallback deliverCallback = (consumerTag, delivery) -> {
+
                 // Form of "resort day skier time lift"
                 String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
-
+                //System.out.println(" [x] Received msg: " + message);  // TODO: make this a log w/ DEBUG level
                 // Extract into parts
                 String[] parts = message.split(",");
 
