@@ -10,7 +10,7 @@ public class DataSource {
 
     private static final HikariConfig config = new HikariConfig();
     private static final HikariDataSource ds;
-    private static int poolSize;
+    private static final int poolSize;
 
     static {
         Map<String, String> env = System.getenv();

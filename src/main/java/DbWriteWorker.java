@@ -11,7 +11,7 @@ import java.util.concurrent.TimeoutException;
 
 public class DbWriteWorker implements Runnable {
 
-    private final static String QUEUE_NAME = "DB_POST";
+    private final static String QUEUE_NAME = "DB_POST_DURABLE";
     private final SkierDbConnection dbConn = new SkierDbConnection();
 
     @Override
@@ -30,7 +30,12 @@ public class DbWriteWorker implements Runnable {
 
         try {
             Channel channel = connection.createChannel();
-            channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+            boolean durable = true;
+            channel.queueDeclare(QUEUE_NAME, durable, false, false, null);
+
+            // Ensure messages are distributed by workload
+            int prefetchCount = 1;
+            channel.basicQos(prefetchCount);
 
             DeliverCallback deliverCallback = (consumerTag, delivery) -> {
 
